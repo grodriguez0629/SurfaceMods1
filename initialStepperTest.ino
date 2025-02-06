@@ -8,7 +8,7 @@ void setup() {
   pinMode(stepper_pin, OUTPUT);
 
   //Sets the initial direction of the stepper motor (based on where A1, A2, B1, and B2 are connected)
-  digitalWrite(DIR_PIN, HIGH);
+  digitalWrite(direction_pin, HIGH);
 
 }
 
