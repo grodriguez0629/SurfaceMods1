@@ -11,8 +11,8 @@
 
 //steppers labeled for left and right shoulders
 //type, pin1, pin2, pin3, pin4
-AccelStepper leftStepper(AccelStepper::FULL4WIRE, 22, 23, 24, 25);
-AccelStepper rightStepper(AccelStepper::FULL4WIRE, 28, 29, 30, 31);
+AccelStepper leftStepper(AccelStepper::DRIVER, 22, 23);
+AccelStepper rightStepper(AccelStepper::DRIVER, 24, 25);
 
 //control var that determines the steppers' current position
 //position is in steps; consider that 50 steps = 90deg
