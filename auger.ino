@@ -1,55 +1,103 @@
 //libs
-#include <AccelStepper.h>
+#include <CytronMotorDriver.h>
 
-//auger stepper
-//type, pin1, pin2, pin3, pin4
-AccelStepper auger(AccelStepper::driver, 22, 23);
+//pins
+#define PWM_PIN 44
+#define DIR_PIN 45
+
+//auger
+//type, pwm, pwm
+CytronMD auger(PWM_DIR, PWM_PIN, DIR_PIN);
+
+//spd profile variables
+int acc = 0;
+int dec = 0;
+int maxSpd = 0;
+int currSpd = 0;
 
 void setup() {
   Serial.begin(9600);
-  
-  /*
-  stepper initialization
-  set max speed, in steps/s
-  at max, move 90deg in 1s (50 steps/s * 1.8deg/step = 90deg/s)
-  */
-  auger.setMaxSpeed(1000);
-  auger.setAcceleration(500);
+  pinMode(PWM_PIN, OUTPUT);
+  pinMode(DIR_PIN, OUTPUT);
+
+  spdProfile(3);
 }
 
-//moves the auger drill at a desired speed
-void dig(AccelStepper stepper, float spd) {
-  auger.setSpeed(spd);
-  auger.runSpeed();
+//allow the user to select a speed profile
+void spdProfile(int prof) {
+  switch(prof) {
+    //low speed
+    case 0:
+      acc = 1;
+      dec = 1;
+      maxSpd = 10;
+      break;
+
+    //high speed
+    case 1:
+      acc = 1;
+      dec = 1;
+      maxSpd = 20;
+      break;
+
+    //off
+    case 3:
+      acc = 1;
+      dec = 1;
+      maxSpd = 0;
+      break;
+  }
+}
+
+//moves the auger drill towards a desired speed
+void dig(CytronMD auger, int acc) {
+  //checks current speed
+  int spd = analogRead(PWM_PIN);
+
+  if(spd < maxSpd) {
+    //accelerates by increasing speed by ~2%/0.5ms up to maxSpd
+    while(spd < maxSpd) {
+      spd += acc;
+      auger.setSpeed(spd);
+      delay(500);
+    }
+  }
+  else if(spd > maxSpd) {
+    //deccelerates by decreasing speed by ~2%/0.5s down to maxSpd
+    while(spd < maxSpd) {
+      spd -= dec;
+      auger.setSpeed(spd);
+      delay(500);
+    }
+  }  
 }
 
 void emergencyStop() {
-  auger.stop();
+  auger.setSpeed(0);
 }
 
 
 void loop() {
-  //init variables
-  AccelStepper stepper;
-  float spd = 100.0;
-
   //serial input; use via serial monitor (or when i interface it w the le potato)
-  string in;
-  string cmd;
+  String in;
+  String cmd;
 
-  //select shoulder to change
-
-  in = Serial.println("Status (On/Off): ");
+  in = Serial.println("Speed (Low/High/Off): ");
   while (Serial.available() == 0) {} 
   cmd = Serial.readString();
   cmd.trim();
-  if (cmd == "On") {
-    dig(stepper, spd);
+  if (cmd == "Low") {
+    spdProfile(0);
+  }
+  else if (cmd == "High") {
+    spdProfile(1);
   }
   else if (cmd == "Off") {
-    emergencyStop();
+    spdProfile(2);
   }
   else {
     Serial.println("ERROR: Invalid command entered.");
   }
+
+  dig(auger, acc);
 }
