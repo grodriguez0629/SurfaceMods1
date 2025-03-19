@@ -1,4 +1,5 @@
 //CHANGELOG
+//v0.41: updated setDirection() to switch even if maxSpd is 0.
 //v0.4: added changelog and documentation and comments for each variable, definition, and function parameter.
 //v0.3: added direction switching via setDirection() and SWITCH command
 //v0.2: rewritten code to use the CytronMotorDriver library by cytron technologies
@@ -91,12 +92,19 @@ void spdProfile(int prof) {
 //switches the direction of the motor to either clockwise or counterclockwise
 //param [String dir] will accept either "CW" or "CCW". other values will not do anything.
 //will only switch directions if currently capable, and will not switch if the max speed is set incorrectly.
+//if the speed is currently 0, will switch between "CW" and "CCW".
 void setDirection(String dir) {
   if(dir == "CW" && maxSpd < 0) {
     maxSpd *= -1;
   }
   else if(dir == "CCW" && maxSpd > 0) {
     maxSpd *= -1;
+  }
+  else if(dir == "CW" && maxSpd == 0) {
+    dir = "CCW";
+  }
+  else if(dir == "CCW" && maxSpd == 0) {
+    dir = "CW";
   }
   else {
     Serial.println("ERROR: Invalid direction specified.");
