@@ -4,13 +4,13 @@
 #include <HighPowerStepperDriver.h>
 
 //pin outs
-#define CS_PIN1 25
-#define STEP_PIN1 26
-#define DIR_PIN1 27
+#define CS_PIN1 29
+#define STEP_PIN1 30
+#define DIR_PIN1 31
 
-#define CS_PIN2 29
-#define STEP_PIN2 30
-#define DIR_PIN2 31
+#define CS_PIN2 32
+#define STEP_PIN2 34
+#define DIR_PIN2 35
 
 //definitions that determine direction, step angle, and max turning angles
 #define UP 1
@@ -36,9 +36,9 @@ additional stepper info
 */
 
 void setup() {
+  SPI.begin();
   Serial.begin(9600);
 
-  SPI.begin();
   leftStepper.setChipSelectPin(CS_PIN1);
   rightStepper.setChipSelectPin(CS_PIN2);
   
@@ -58,13 +58,15 @@ void setup() {
   leftStepper.clearStatus();
   leftStepper.setDecayMode(HPSDDecayMode::AutoMixed);
   leftStepper.setCurrentMilliamps36v8(4000);
-  leftStepper.setStepMode(HPSDStepMode::MicroStep256);
+  leftStepper.setStepMode(HPSDStepMode::MicroStep1);
+  leftStepper.enableDriver();
 
   rightStepper.resetSettings();
   rightStepper.clearStatus();
   rightStepper.setDecayMode(HPSDDecayMode::AutoMixed);
   rightStepper.setCurrentMilliamps36v8(4000);
-  rightStepper.setStepMode(HPSDStepMode::MicroStep256);
+  rightStepper.setStepMode(HPSDStepMode::MicroStep1);
+  rightStepper.enableDriver();
 }
 
 void step(int stepPin) {
@@ -75,13 +77,17 @@ void step(int stepPin) {
 }
 
 void setDirection(int dirPin, int dir) {
-  delayMicroseconds(2);
+  Serial.println(dirPin);
+  delayMicroseconds(1);
   if(dir == UP) {
+    Serial.println("MOVING UP");
     digitalWrite(dirPin, HIGH);
   }
   else if(dir == DOWN) {
+    Serial.println("MOVING DOWN");
     digitalWrite(dirPin, LOW);
   }
+  delayMicroseconds(1);
 }
 
 //moves the shoulder of the selected stepper, at a desired spd
@@ -163,11 +169,11 @@ void loop() {
   //but as of right now testing it with the serial monitor like this will make it easier to ensure the functions work
   if(cmd[0] == 'L') {
     if(cmd[1] == 'U' && posLeft < MAX_ANGLE) {
-      setDirection(STEP_PIN1, UP);
+      setDirection(DIR_PIN1, UP);
       moveShoulder(cmd[0], UP);
     }
     else if(cmd[1] == 'D' && posLeft > MIN_ANGLE) {
-      setDirection(STEP_PIN1, DOWN);
+      setDirection(DIR_PIN1, DOWN);
       moveShoulder(cmd[0], DOWN);
     }
     else {
@@ -176,11 +182,11 @@ void loop() {
   }
   else if(cmd[0] == 'R') {
     if(cmd[1] == 'U' && posRight < MAX_ANGLE) {
-      setDirection(STEP_PIN2, UP);
+      setDirection(DIR_PIN2, UP);
       moveShoulder(cmd[0], UP);
     }
     else if(cmd[1] == 'D' && posRight > MIN_ANGLE) {
-      setDirection(STEP_PIN2, DOWN);
+      setDirection(DIR_PIN2, DOWN);
       moveShoulder(cmd[0], DOWN);
     }
     else {
@@ -191,3 +197,4 @@ void loop() {
     Serial.println("ERROR: Invalid command entered. (L/R)");
   }
 }
+
