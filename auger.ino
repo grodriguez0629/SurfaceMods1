@@ -1,3 +1,9 @@
+//CHANGELOG
+//v0.4: added changelog and documentation and comments for each variable, definition, and function parameter.
+//v0.3: added direction switching via setDirection() and SWITCH command
+//v0.2: rewritten code to use the CytronMotorDriver library by cytron technologies
+//v0.1: initial version of code using the AccelStepper library by arduino
+
 //libs
 //this code uses the cytron motor driver library by cytron technologies:
 //https://github.com/CytronTechnologies/CytronMotorDriver
