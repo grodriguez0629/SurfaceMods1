@@ -5,17 +5,23 @@
 
 //pins
 #define PWM_PIN 44
-#define DIR_PIN 45
+#define DIR_PIN 42
 
 //auger
-//type, pwm, pwm
+//type, pwm pin, dir pin
 CytronMD auger(PWM_DIR, PWM_PIN, DIR_PIN);
+
+//direction definitions
+#define CW 1
+#define CCW -1
 
 //spd profile variables
 int acc = 0;
 int dec = 0;
 int maxSpd = 0;
 int currSpd = 0;
+String currProf = "OFF";
+String currDir = "CW";
 
 void setup() {
   Serial.begin(9600);
@@ -32,18 +38,18 @@ void spdProfile(int prof) {
     case 0:
       acc = 1;
       dec = 1;
-      maxSpd = 10;
+      maxSpd = 20;
       break;
 
     //high speed
     case 1:
       acc = 1;
       dec = 1;
-      maxSpd = 20;
+      maxSpd = 40;
       break;
 
     //off
-    case 3:
+    case 2:
       acc = 1;
       dec = 1;
       maxSpd = 0;
@@ -54,24 +60,33 @@ void spdProfile(int prof) {
 //moves the auger drill towards a desired speed
 void dig(CytronMD auger, int acc) {
   //checks current speed
-  int spd = analogRead(PWM_PIN);
+  int spd = currSpd;
+  Serial.println("Current speed: " + String(spd));
+  Serial.println("Target speed: " + String(maxSpd));
 
   if(spd < maxSpd) {
     //accelerates by increasing speed by ~2%/0.5ms up to maxSpd
     while(spd < maxSpd) {
       spd += acc;
+      currSpd = spd;
       auger.setSpeed(spd);
       delay(500);
     }
   }
   else if(spd > maxSpd) {
     //deccelerates by decreasing speed by ~2%/0.5s down to maxSpd
-    while(spd < maxSpd) {
+    while(spd > maxSpd) {
       spd -= dec;
+      currSpd = spd;
       auger.setSpeed(spd);
       delay(500);
     }
-  }  
+  }
+  else {
+    Serial.println("No change in speed.");
+  }
+
+  Serial.println("Finished altering speed.");
 }
 
 void emergencyStop() {
@@ -84,18 +99,26 @@ void loop() {
   String in;
   String cmd;
 
-  in = Serial.println("Speed (Low/High/Off): ");
+  Serial.println("COMMANDS");
+  Serial.println("=================");
+  Serial.println("Speed: LOW/HIGH/OFF [CURRENT: " + currProf);
+  Serial.println("Direction: SWITCH [CURRENT: " + currDir);
+
+  in = Serial.println("");
   while (Serial.available() == 0) {} 
   cmd = Serial.readString();
   cmd.trim();
-  if (cmd == "Low") {
+  if(cmd == "LOW") {
     spdProfile(0);
   }
-  else if (cmd == "High") {
+  else if(cmd == "HIGH") {
     spdProfile(1);
   }
-  else if (cmd == "Off") {
+  else if(cmd == "OFF") {
     spdProfile(2);
+  }
+  else if(cmd == "SWITCH") {
+    maxSpd *= -1;
   }
   else {
     Serial.println("ERROR: Invalid command entered.");
