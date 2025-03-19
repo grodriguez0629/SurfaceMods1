@@ -1,9 +1,18 @@
 //libs
-#include <AccelStepper.h>
+#include <HighPowerStepperDriver.h>
+
+//pin outs
+#define CS_PIN1 25
+#define STEP_PIN1 26
+#define DIR_PIN1 27
+
+#define CS_PIN2 29
+#define STEP_PIN2 30
+#define DIR_PIN2 31
 
 //definitions that determine direction, step angle, and max turning angles
-#define UP 1     //+ val moves stepper cw
-#define DOWN -1  //- val moves stepper ccw
+#define UP 1
+#define DOWN -1
 
 #define STEP 1.8     //stepper angle = 1.8deg. mainly used for converting steps -> deg
 #define MAX_ANGLE 90.0 //max angle allowed to turn = 90deg
@@ -11,14 +20,12 @@
 
 //steppers labeled for left and right shoulders
 //type, pin1, pin2, pin3, pin4
-AccelStepper leftStepper(AccelStepper::DRIVER, 22, 23);
-AccelStepper rightStepper(AccelStepper::DRIVER, 24, 25);
+HighPowerStepperDriver leftStepper;
+HighPowerStepperDriver rightStepper;
 
-//control var that determines the steppers' current position
-//position is in steps; consider that 50 steps = 90deg
+//control vars that determines the steppers' current position, measured in degrees
 float posLeft = 0;
 float posRight = 0;
-bool left;
 
 /*
 additional stepper info
@@ -28,70 +35,99 @@ additional stepper info
 
 void setup() {
   Serial.begin(9600);
-  
-  /*
-  stepper initialization
-  set max speed, in steps/s
-  at max, move 90deg in 1s (50 steps/s * 1.8deg/step = 90deg/s)
-  */
-  leftStepper.setMaxSpeed(50);
-  rightStepper.setMaxSpeed(50);
 
-  //note: no acceleration being set means it'll just run at a constant speed.
+  SPI.begin();
+  leftStepper.setChipSelectPin(CS_PIN1);
+  rightStepper.setChipSelectPin(CS_PIN2);
+  
+  //pin initialization
+  pinMode(CS_PIN1, OUTPUT);
+  pinMode(DIR_PIN1, OUTPUT);
+  pinMode(CS_PIN2, OUTPUT);
+  pinMode(DIR_PIN2, OUTPUT);
+
+  digitalWrite(CS_PIN1, LOW);
+  digitalWrite(DIR_PIN1, LOW);
+  digitalWrite(CS_PIN2, LOW);
+  digitalWrite(DIR_PIN2, LOW);
+
+  //stepper initialization
+  leftStepper.resetSettings();
+  leftStepper.clearStatus();
+  leftStepper.setDecayMode(HPSDDecayMode::AutoMixed);
+  leftStepper.setCurrentMilliamps36v8(4000);
+  leftStepper.setStepMode(HPSDStepMode::MicroStep256);
+
+  rightStepper.resetSettings();
+  rightStepper.clearStatus();
+  rightStepper.setDecayMode(HPSDDecayMode::AutoMixed);
+  rightStepper.setCurrentMilliamps36v8(4000);
+  rightStepper.setStepMode(HPSDStepMode::MicroStep256);
 }
 
-//moves the shoulder of the selected stepper, at a desired spd, in the direction given (up=1, down=-1)
-void moveShoulder(AccelStepper &stepper, float spd, int dir) {
+void step(int stepPin) {
+  digitalWrite(stepPin, HIGH);
+  delayMicroseconds(2);
+  digitalWrite(stepPin, LOW);
+  delayMicroseconds(2);
+}
+
+void setDirection(int dirPin, int dir) {
+  delayMicroseconds(2);
+  if(dir == UP) {
+    digitalWrite(dirPin, HIGH);
+  }
+  else if(dir == DOWN) {
+    digitalWrite(dirPin, LOW);
+  }
+}
+
+//moves the shoulder of the selected stepper, at a desired spd
+void moveShoulder(char side, int dir) {
+  int stepPin;
+
   //checks for the current shoulder being moved and updates the position
-  //also determines whether to keep moving; should auto stop when <= 0deg or >= 90deg to prevent overturning
-  if(left) {
+  if(side == 'L') {
+    stepPin = STEP_PIN1;
+
+    //move one step
+    step(stepPin);
     Serial.println("Current position of left shoulder: " + String(posLeft));
-    //move one step up or down
-    stepper.move(STEP*dir);
-    stepper.run();
-    posLeft = stepper.currentPosition() * STEP;
+    posLeft += STEP*dir;
 
     while(posLeft > MIN_ANGLE && posLeft < MAX_ANGLE) {
-      stepper.setSpeed(spd*dir);
-      stepper.runSpeed();
+      step(stepPin);
 
-      //converts the position in steps to degrees
-      posLeft = stepper.currentPosition() * STEP;
+      //for each step, add 1.8deg to the current position
+      posLeft += STEP*dir;
       Serial.println("Current position of left shoulder: " + String(posLeft));
     }
-
-    //if the stepper is turned at 0 or 90deg, immediately stop turning
-    Serial.println("Stopping movement!");
-    stepper.stop();
   }
   else {
+    stepPin = STEP_PIN2;
+
+    //move one step
+    step(stepPin);
     Serial.println("Current position of right shoulder: " + String(posRight));
-    //move one step up or down
-    stepper.move(STEP*dir);
-    stepper.run();
-    posRight = stepper.currentPosition() * STEP;
+    posRight += STEP*dir;
 
     while(posRight > MIN_ANGLE && posRight < MAX_ANGLE) {
-      stepper.setSpeed(spd*dir);
-      stepper.runSpeed();
+      step(stepPin);
 
-      //converts the position in steps to degrees
-      posRight = stepper.currentPosition() * STEP;
+      //for each step, add 1.8deg to the current position
+      posRight += STEP*dir;
       Serial.println("Current position of right shoulder: " + String(posRight));
     }
-
-    //if the stepper is turned at 0 or 90deg, immediately stop turning
-    Serial.println("Stopping movement!");
-    stepper.stop();
   }
+
+  //if the stepper is turned at 0 or 90deg, immediately stop turning
+  Serial.println("Stopping movement!");
+  digitalWrite(stepPin, LOW);
 }
 
 void emergencyStop() {
-  leftStepper.stop();
-  rightStepper.stop();
-
-  posLeft = leftStepper.currentPosition() * STEP;
-  posRight = rightStepper.currentPosition() * STEP;
+  digitalWrite(STEP_PIN1, LOW);
+  digitalWrite(STEP_PIN2, LOW);
 }
 
 
@@ -124,26 +160,26 @@ void loop() {
   //like you should just be able to take it in as bytes instead, which is probably better for sensors and stuff,
   //but as of right now testing it with the serial monitor like this will make it easier to ensure the functions work
   if(cmd[0] == 'L') {
-    left = true;
-
     if(cmd[1] == 'U' && posLeft < MAX_ANGLE) {
-      moveShoulder(leftStepper, spd, UP);
+      setDirection(STEP_PIN1, UP);
+      moveShoulder(cmd[0], UP);
     }
     else if(cmd[1] == 'D' && posLeft > MIN_ANGLE) {
-      moveShoulder(leftStepper, spd, DOWN);
+      setDirection(STEP_PIN1, DOWN);
+      moveShoulder(cmd[0], DOWN);
     }
     else {
       Serial.println("ERROR: Invalid command entered. (U/D)");
     }
   }
   else if(cmd[0] == 'R') {
-    left = false;
-
     if(cmd[1] == 'U' && posRight < MAX_ANGLE) {
-      moveShoulder(rightStepper, spd, UP);
+      setDirection(STEP_PIN2, UP);
+      moveShoulder(cmd[0], UP);
     }
     else if(cmd[1] == 'D' && posRight > MIN_ANGLE) {
-      moveShoulder(rightStepper, spd, DOWN);
+      setDirection(STEP_PIN2, DOWN);
+      moveShoulder(cmd[0], DOWN);
     }
     else {
       Serial.println("ERROR: Invalid command entered. (U/D)");
