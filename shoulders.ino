@@ -1,4 +1,6 @@
 //libs
+//uses the high power stepper driver arduino library by polulu:
+//https://github.com/pololu/high-power-stepper-driver-arduino
 #include <HighPowerStepperDriver.h>
 
 //pin outs
