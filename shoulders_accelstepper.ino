@@ -1,10 +1,13 @@
 /*
 this version of the shoulder code is the original code 
 that was using the accelstepper library instead of the library provided by polulu.
-if this set of code works in addition to the code used by the polulu,
-then use this one instead; this is is because it shares a library with the drive code, and so i
+if this set of code works in addition to the code used by the polulu, then use this one instead.
+
+this is because it shares a library with the drive code, and so i
 believe that this will make it easier to document and maintain since we're not 
 switching between 3 different libraries with different documentations.
+
+if it doesn't work, then this can be discarded or archived.
 */
 
 //libs
@@ -44,6 +47,12 @@ additional stepper info
 
 void setup() {
   Serial.begin(9600);
+
+  pinMode(DIR_PIN1, OUTPUT);
+  pinMode(DIR_PIN2, OUTPUT);
+
+  digitalWrite(DIR_PIN1, LOW);
+  digitalWrite(DIR_PIN2, LOW);
   
   /*
   stepper initialization
