@@ -1,4 +1,6 @@
 //libs
+//uses the cytron motor driver library by cytron technologies:
+//https://github.com/CytronTechnologies/CytronMotorDriver
 #include <CytronMotorDriver.h>
 
 //pins
