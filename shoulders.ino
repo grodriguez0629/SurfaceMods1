@@ -4,6 +4,10 @@
 #include <HighPowerStepperDriver.h>
 
 //pin outs
+//[CS_PIN] defines the chipset pin on the arduino being used; necessary for communication with SPI.
+//[STEPPIN] defines the step pin on the arduino being used; tells the motor when to step forward.
+//[DIR_PIN] defines the digital pin on the arduino being used; controls the motor's direction.
+//since there are 2 different shoulders to control, there are 2 different sets of pins here.
 #define CS_PIN1 29
 #define STEP_PIN1 30
 #define DIR_PIN1 31
@@ -13,29 +17,35 @@
 #define DIR_PIN2 35
 
 //definitions that determine direction, step angle, and max turning angles
+//mainly used for tracking the current position of the motor.
+//[UP] is used to increase the position tracker in the positive direction.
+//[DOWN] is used to decrease the position tracker in the negative direction.
+//[STEP] defines the stepper angle and is mainly used to convert the step count to degrees for position tracking.
+//       note: when changing the microstep resolution, make sure to change this value divided by the resolution.
+//             for example, if using HPSDStepMode::MicroStep256, divide 1.8/256 for a step angle of ~0.007deg.
+//[MAX_ANGLE] defines the maximum turning angle for the shoulder in degrees.
+//[MIN_ANGLE] defines the minimum turning angle for the shoulder in degrees.
 #define UP 1
 #define DOWN -1
 
-#define STEP 1.8     //stepper angle = 1.8deg. mainly used for converting steps -> deg
-#define MAX_ANGLE 90.0 //max angle allowed to turn = 90deg
-#define MIN_ANGLE 0.0  //min angle allowed to turn = 0deg
+#define STEP 1.8
+#define MAX_ANGLE 90.0
+#define MIN_ANGLE 0.0
 
 //steppers labeled for left and right shoulders
-//type, pin1, pin2, pin3, pin4
+//the high power stepper driver library does *not* have constructors,
+//so defining them here is the only thing necessary.
 HighPowerStepperDriver leftStepper;
 HighPowerStepperDriver rightStepper;
 
 //control vars that determines the steppers' current position, measured in degrees
+//tracks the current position of the shoulders.
+//this WILL reset back to 0 if the power of the device is shut off while turning and would have to be saved elsewhere to prevent over or underturning.
 float posLeft = 0;
 float posRight = 0;
 
-/*
-additional stepper info
-4 wire full stepper
-1.8deg stepper angle (200 steps/rev)
-*/
-
 void setup() {
+  //begin SPI and serial communication
   SPI.begin();
   Serial.begin(9600);
 
@@ -69,6 +79,8 @@ void setup() {
   rightStepper.enableDriver();
 }
 
+//function that allows the motor to step by writing HIGH to the desired pin.
+//param [int stepPin] accepts the stepPin you want to write to.
 void step(int stepPin) {
   digitalWrite(stepPin, HIGH);
   delayMicroseconds(2);
@@ -76,8 +88,13 @@ void step(int stepPin) {
   delayMicroseconds(2);
 }
 
+//function that sets the direction of the motor by writing HIGH or LOW to the desired pin.
+//param [int dirPin] accepts the current direction pin you want to write to.
+//param [int dir] accepts the current direction the motor should change to.
+//                note: this function is reliant on the definitions for UP and DOWN at the top.
+//                      it can be changed to accept 0 and 1 for LOW and HIGH respectively, 
+//                      rather than using a conditional to read whcih direction was sent in. 
 void setDirection(int dirPin, int dir) {
-  Serial.println(dirPin);
   delayMicroseconds(1);
   if(dir == UP) {
     Serial.println("MOVING UP");
@@ -91,6 +108,10 @@ void setDirection(int dirPin, int dir) {
 }
 
 //moves the shoulder of the selected stepper, at a desired spd
+//param [char side] accepts either 'L' or 'R', and is used with the serial input to determine which shoulder to move.
+//param [int dir] determines which direction the shoulder is moving in
+//                note: similarly to setDirection(), this is reliant on the defintions for UP and DOWN at the top.
+//                      in this case, it is primarily used to track the position in conjunction with the STEP definition.
 void moveShoulder(char side, int dir) {
   int stepPin;
 
@@ -140,33 +161,29 @@ void emergencyStop() {
 
 
 void loop() {
-  //init variables
-  float spd = 10.0;
-
-  //serial input; use via serial monitor (or when i interface it w the le potato)
+  //serial input; use via serial monitor OR a serial communication script interfaced with another board like a raspberry pi
   String input;
   String cmd;
 
   //select shoulder to change
+  //takes in input and trims it to remove terminating characters
   input = Serial.println("Shoulder (L/R): ");
   while (Serial.available() == 0) {}
   cmd = Serial.readString();
   cmd.trim();
 
+  //command direction to move the shoulder in
+  //takes in input and trims it to remove terminating characters
   input = Serial.println("Direction (U/D): ");
   while (Serial.available() == 0) {} 
   cmd += Serial.readString();
   cmd.trim();
 
-  /*
-  debug
-  Serial.println(input);
-  Serial.println(cmd);
-  */
-
-  //this code is pretty clunky. i'll probably clean it up later
-  //like you should just be able to take it in as bytes instead, which is probably better for sensors and stuff,
-  //but as of right now testing it with the serial monitor like this will make it easier to ensure the functions work
+  //interprets the given command:
+  //L == selects the left shoulder for movement
+  //R == selects the right shoulder for movement
+  //U == commands the shoulder to move upwards. will send an error if shoulder is currently unable to turn
+  //D == commands eh shoulder to move downwards. will send an error if shoulder is currently unable to turn
   if(cmd[0] == 'L') {
     if(cmd[1] == 'U' && posLeft < MAX_ANGLE) {
       setDirection(DIR_PIN1, UP);
