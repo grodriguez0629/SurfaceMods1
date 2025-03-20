@@ -1,3 +1,9 @@
+//CHANGELOG
+//v0.4: added changelog and documentation and comments for each variable, definition, and function parameter.
+//v0.3: completed code after testing and updating to ensure functionality.
+//v0.2: rewritten code to use the HighPowerStepperDriver library by pololu
+//v0.1: initial version of code using the AccelStepper library by arduino
+
 //libs
 //uses the high power stepper driver arduino library by polulu:
 //https://github.com/pololu/high-power-stepper-driver-arduino
