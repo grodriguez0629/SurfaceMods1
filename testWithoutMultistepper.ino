@@ -6,25 +6,25 @@ AccelStepper stepper1(1, 34, 36); // (Typeof driver: with 2 pins, STEP, DIR)
 AccelStepper stepper2(1, 35, 33);
 AccelStepper stepper3(1, 32, 31);
 
-long gotoposition[3]; // An array to store the target positions for each stepper motor
 
+//Set up is automatically run once the second the code runs
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); //Enable serial
   stepper1.setMaxSpeed(1000); // Set maximum speed value for the stepper
   stepper2.setMaxSpeed(1000);
   stepper3.setMaxSpeed(1000);
-
-  // Adding the 3 steppers to the steppersControl instance for multi stepper control
 }
 
 
 
 void moveForward(int steps) {
   //Set the movements that need to be done
-  stepper1.move(steps);  // 800 steps - full rotation with quater-step resolution
+  stepper1.move(steps); 
   stepper2.move(steps);
   stepper3.move(steps); 
+   //While the steppers have not reached their final position
   while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
+    //run each stepper
     stepper1.run();
     stepper2.run();
     stepper3.run();
@@ -33,10 +33,12 @@ void moveForward(int steps) {
 
 void moveBackward(int steps) {
   //Set the movements that need to be done
-  stepper1.move(-steps);  // 800 steps - full rotation with quater-step resolution
+  stepper1.move(-steps); 
   stepper2.move(-steps);
   stepper3.move(-steps); 
+  //While the steppers have not reached their final position
   while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
+    //run each stepper
     stepper1.run();
     stepper2.run();
     stepper3.run();
@@ -45,10 +47,12 @@ void moveBackward(int steps) {
 
 void turnLeft(int steps) {
   //Set the movements that need to be done
-  stepper1.move(steps);  // 800 steps - full rotation with quater-step resolution
+  stepper1.move(-steps); 
   stepper2.move(steps);
   stepper3.move(steps); 
+  //While the steppers have not reached their final position
   while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
+    //run each stepper
     stepper1.run();
     stepper2.run();
     stepper3.run();
@@ -57,9 +61,10 @@ void turnLeft(int steps) {
 
 void turnRight(int steps) {
   //Set the movements that need to be done
-  stepper1.move(steps);  // 800 steps - full rotation with quater-step resolution
+  stepper1.move(steps); 
   stepper2.move(steps);
-  stepper3.move(steps); 
+  stepper3.move(-steps); 
+  //While the steppers have not reached their final position
   while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
     stepper1.run();
     stepper2.run();
@@ -70,7 +75,6 @@ void turnRight(int steps) {
 
 
 void loop() {
-  // Store the target positions in the "gotopostion" array
   //Prompt for user input
   Serial.println("Enter command (F, B, L, R) and steps. (ex: 'F 200'): ");
   //Wait for user input
@@ -92,23 +96,23 @@ void loop() {
 
   //Switch statement to execute proper movement based on choice.
   switch(direction) {
-    case 'F':
+    case 'F': //If F, run move forward the number of steps
       Serial.println("Moving forward");
       moveForward(steps);
       break;
-    case 'B':
+    case 'B': //If B, run move backward the number of steps
       Serial.println("Moving backward");
       moveBackward(steps);
       break;
-    case 'L':
+    case 'L': //If L, run turn left the number of steps
       Serial.println("Turning left");
       turnLeft(steps);
       break;
-    case 'R':
+    case 'R': //If R, run turn right the number of steps
       Serial.println("Turning right");
       turnRight(steps);
       break;
-    default:
+    default: //If it doesn't match any of these, print out invalid
       Serial.println("Invalid command.");
       break;
   }
