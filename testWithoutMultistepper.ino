@@ -1,10 +1,10 @@
 #include <AccelStepper.h>
-#include <MultiStepper.h>
 
 // Define the stepper motor and the pins that is connected to
 AccelStepper stepper1(1, 34, 36); // (Typeof driver: with 2 pins, STEP, DIR)
 AccelStepper stepper2(1, 35, 33);
 AccelStepper stepper3(1, 32, 31);
+AccelStepper stepper3(1, 37,38);
 
 
 //Set up is automatically run once the second the code runs
@@ -13,8 +13,9 @@ void setup() {
   stepper1.setMaxSpeed(1000); // Set maximum speed value for the stepper
   stepper2.setMaxSpeed(1000);
   stepper3.setMaxSpeed(1000);
-}
+  stepper4.setMaxSpeed(1000);
 
+}
 
 
 void moveForward(int steps) {
@@ -22,12 +23,14 @@ void moveForward(int steps) {
   stepper1.move(steps); 
   stepper2.move(steps);
   stepper3.move(steps); 
+  stepper4.move(steps); 
    //While the steppers have not reached their final position
-  while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
-    //run each stepper
+while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
     stepper1.run();
     stepper2.run();
     stepper3.run();
+    stepper4.run();
+
   }
 }
 
@@ -36,12 +39,13 @@ void moveBackward(int steps) {
   stepper1.move(-steps); 
   stepper2.move(-steps);
   stepper3.move(-steps); 
+  stepper4.move(-steps); 
   //While the steppers have not reached their final position
-  while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
-    //run each stepper
+while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
     stepper1.run();
     stepper2.run();
     stepper3.run();
+    stepper4.run();
   }
 }
 
@@ -50,25 +54,28 @@ void turnLeft(int steps) {
   stepper1.move(-steps); 
   stepper2.move(steps);
   stepper3.move(steps); 
+  stepper4.move(-steps); 
   //While the steppers have not reached their final position
-  while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
-    //run each stepper
+while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
     stepper1.run();
     stepper2.run();
     stepper3.run();
+    stepper4.run();
   }
 }
-
 void turnRight(int steps) {
   //Set the movements that need to be done
   stepper1.move(steps); 
   stepper2.move(steps);
   stepper3.move(-steps); 
+  stepper4.move(-steps); 
+
   //While the steppers have not reached their final position
-  while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0) {
+  while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {
     stepper1.run();
     stepper2.run();
     stepper3.run();
+    stepper4.run();
   }
 }
 
