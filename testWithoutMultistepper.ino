@@ -1,10 +1,10 @@
 #include <AccelStepper.h>
 
 // Define the stepper motor and the pins that is connected to
-AccelStepper stepper1(1, 34, 36); // (Typeof driver: with 2 pins, STEP, DIR)
-AccelStepper stepper2(1, 35, 33);
-AccelStepper stepper3(1, 32, 31);
-AccelStepper stepper3(1, 37,38);
+AccelStepper stepper1(1, 22, 23); // (Typeof driver: with 2 pins, STEP, DIR) //Front Left
+AccelStepper stepper2(1, 26, 27); //Front Right
+AccelStepper stepper3(1, 28, 29); //Rear Right
+AccelStepper stepper4(1, 24,25); //Rear Left
 
 
 //Set up is automatically run once the second the code runs
@@ -66,9 +66,9 @@ while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.d
 void turnRight(int steps) {
   //Set the movements that need to be done
   stepper1.move(steps); 
-  stepper2.move(steps);
+  stepper2.move(-steps);
   stepper3.move(-steps); 
-  stepper4.move(-steps); 
+  stepper4.move(steps); 
 
   //While the steppers have not reached their final position
   while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {
