@@ -8,23 +8,30 @@ from tkinter import ttk
 #serial initialization
 #serial port for communication
 #baudrate
-SERIALPORT = 'PLACEHOLDER'
+SERIALPORT = 'COM3'
 BAUDRATE = 9600
-board = serial.Serial(port=SERIALPORT, baudrate=BAUDRATE)
+#board = serial.Serial(port=SERIALPORT, baudrate=BAUDRATE)
 
 #sends rover movement to the board
 def send_movement(steps, dir):
     print("moving rover " + steps.get() + " steps " + dir.get())
     cmd = steps.get() + " " + dir.get()
     print(cmd)
-    board.write(cmd.encode())
+ #   board.write(cmd.encode())
 
 #sends shoulder movement to the board
 def send_shoulder(side, dir):
     print("moving " + side.get() + " shoulder " + dir.get())
     cmd = side.get() + " " + dir.get()
     print(cmd)
-    board.write(cmd.encode())
+  #  board.write(cmd.encode())
+
+#sends auger movemnt
+def send_auger(spd_prof, dir):
+    print("spd profile " + spd_prof.get() + " at dir " + dir.get())
+    cmd = spd_prof.get() + " " + dir.get()
+    print(cmd)
+   # board.write(cmd.encode())
 
 #exits program
 def quit():
@@ -106,6 +113,25 @@ def main():
                     variable=shoulder_ud, 
                     value='D', 
                     command=lambda *args: enable_btn(shoulder_btn, shoulder_lr, shoulder_ud)).grid(column=2, row=8)
+
+    #auger handling UI
+    spd_prof = StringVar()
+    direction = StringVar()
+    
+    auger_btn = ttk.Button(frame, text="START AUGER", 
+                              command=lambda *args: send_auger(spd_prof, direction), state='disabled')
+    auger_btn.grid(column=0, row=9)
+    ttk.Label(frame, text="Speed Proflie").grid(column=1, row=9)
+    ttk.Combobox(frame, textvariable=spd_prof, values=['OFF', 'LOW', 'HIGH']).grid(column=1, row=10)
+    ttk.Label(frame, text="Direction").grid(column=1, row=11)
+    ttk.Radiobutton(frame, text="CW", 
+                    variable=direction, 
+                    value='CW', 
+                    command=lambda *args: enable_btn(auger_btn, spd_prof, direction)).grid(column=1, row=12)
+    ttk.Radiobutton(frame, text="CCW", 
+                    variable=direction, 
+                    value='CCW', 
+                    command=lambda *args: enable_btn(auger_btn, spd_prof, direction)).grid(column=2, row=12)
     
     #quit program
     ttk.Button(frame, text="QUIT", command=quit).grid(column=0, row=99)
