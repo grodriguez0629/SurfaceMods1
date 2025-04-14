@@ -1,4 +1,5 @@
 //CHANGELOG
+//v0.5: updated microstep to 32 for more precision and added target rotation (untested)
 //v0.4: added changelog and documentation and comments for each variable, definition, and function parameter.
 //v0.3: completed code after testing and updating to ensure functionality.
 //v0.2: rewritten code to use the HighPowerStepperDriver library by pololu
@@ -34,7 +35,7 @@
 #define UP 1
 #define DOWN -1
 
-#define STEP 1.8
+#define STEP 0.05625
 #define MAX_ANGLE 90.0
 #define MIN_ANGLE 0.0
 
@@ -81,7 +82,7 @@ void setup() {
   rightStepper.clearStatus();
   rightStepper.setDecayMode(HPSDDecayMode::AutoMixed);
   rightStepper.setCurrentMilliamps36v8(4000);
-  rightStepper.setStepMode(HPSDStepMode::MicroStep1);
+  rightStepper.setStepMode(HPSDStepMode::MicroStep32);
   rightStepper.enableDriver();
 }
 
@@ -118,7 +119,7 @@ void setDirection(int dirPin, int dir) {
 //param [int dir] determines which direction the shoulder is moving in
 //                note: similarly to setDirection(), this is reliant on the defintions for UP and DOWN at the top.
 //                      in this case, it is primarily used to track the position in conjunction with the STEP definition.
-void moveShoulder(char side, int dir) {
+void moveShoulder(char side, int dir, int target) {
   int stepPin;
 
   //checks for the current shoulder being moved and updates the position
@@ -131,6 +132,12 @@ void moveShoulder(char side, int dir) {
     posLeft += STEP*dir;
 
     while(posLeft > MIN_ANGLE && posLeft < MAX_ANGLE) {
+      if(dir == DOWN && posLeft <= target) {
+          break; 
+      }
+      else if(dir == UP && posLeft >= target) {
+        break;
+      }
       step(stepPin);
 
       //for each step, add 1.8deg to the current position
@@ -147,6 +154,12 @@ void moveShoulder(char side, int dir) {
     posRight += STEP*dir;
 
     while(posRight > MIN_ANGLE && posRight < MAX_ANGLE) {
+      if(dir == DOWN && posLeft <= target) {
+        break; 
+      }
+      else if(dir == UP && posLeft >= target) {
+        break;
+      }
       step(stepPin);
 
       //for each step, add 1.8deg to the current position
@@ -185,6 +198,11 @@ void loop() {
   cmd += Serial.readString();
   cmd.trim();
 
+  input = Serial.println("Target (0-90): ");
+  while (Serial.available() == 0) {} 
+  cmd += Serial.readString();
+  cmd.trim();
+
   //interprets the given command:
   //L == selects the left shoulder for movement
   //R == selects the right shoulder for movement
@@ -193,11 +211,11 @@ void loop() {
   if(cmd[0] == 'L') {
     if(cmd[1] == 'U' && posLeft < MAX_ANGLE) {
       setDirection(DIR_PIN1, UP);
-      moveShoulder(cmd[0], UP);
+      moveShoulder(cmd[0], UP, cmd.substring(2));
     }
     else if(cmd[1] == 'D' && posLeft > MIN_ANGLE) {
       setDirection(DIR_PIN1, DOWN);
-      moveShoulder(cmd[0], DOWN);
+      moveShoulder(cmd[0], DOWN, cmd.substring(2));
     }
     else {
       Serial.println("ERROR: Invalid command entered. (U/D)");
@@ -206,11 +224,11 @@ void loop() {
   else if(cmd[0] == 'R') {
     if(cmd[1] == 'U' && posRight < MAX_ANGLE) {
       setDirection(DIR_PIN2, UP);
-      moveShoulder(cmd[0], UP);
+      moveShoulder(cmd[0], UP, cmd.substring(2));
     }
     else if(cmd[1] == 'D' && posRight > MIN_ANGLE) {
       setDirection(DIR_PIN2, DOWN);
-      moveShoulder(cmd[0], DOWN);
+      moveShoulder(cmd[0], DOWN, cmd.substring(2));
     }
     else {
       Serial.println("ERROR: Invalid command entered. (U/D)");
