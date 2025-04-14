@@ -10,10 +10,15 @@ AccelStepper stepper4(1, 24,25); //Rear Left
 //Set up is automatically run once the second the code runs
 void setup() {
   Serial.begin(9600); //Enable serial
-  stepper1.setMaxSpeed(2000); // Set maximum speed value for the stepper
-  stepper2.setMaxSpeed(2000);
-  stepper3.setMaxSpeed(2000);
-  stepper4.setMaxSpeed(2000);
+  stepper1.setMaxSpeed(1000); // Set maximum speed value for the stepper
+  stepper2.setMaxSpeed(1000);
+  stepper3.setMaxSpeed(1000);
+  stepper4.setMaxSpeed(1000);
+
+  stepper1.setSpeed(1000);
+  stepper2.setSpeed(1000);
+  stepper3.setSpeed(1000);
+  stepper4.setSpeed(1000);
 
 }
 
@@ -26,10 +31,10 @@ void moveForward(int steps) {
   stepper4.move(steps); 
    //While the steppers have not reached their final position
 while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
-    stepper1.run();
-    stepper2.run();
-    stepper3.run();
-    stepper4.run();
+    stepper1.runSpeed();
+    stepper2.runSpeed();
+    stepper3.runSpeed();
+    stepper4.runSpeed();
 
   }
 }
@@ -42,10 +47,10 @@ void moveBackward(int steps) {
   stepper4.move(-steps); 
   //While the steppers have not reached their final position
 while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
-    stepper1.run();
-    stepper2.run();
-    stepper3.run();
-    stepper4.run();
+    stepper1.runSpeed();
+    stepper2.runSpeed();
+    stepper3.runSpeed();
+    stepper4.runSpeed();
   }
 }
 
@@ -57,10 +62,10 @@ void turnLeft(int steps) {
   stepper4.move(-steps); 
   //While the steppers have not reached their final position
 while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
-    stepper1.run();
-    stepper2.run();
-    stepper3.run();
-    stepper4.run();
+    stepper1.runSpeed();
+    stepper2.runSpeed();
+    stepper3.runSpeed();
+    stepper4.runSpeed();
   }
 }
 void turnRight(int steps) {
@@ -72,10 +77,10 @@ void turnRight(int steps) {
 
   //While the steppers have not reached their final position
   while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {
-    stepper1.run();
-    stepper2.run();
-    stepper3.run();
-    stepper4.run();
+    stepper1.runSpeed();
+    stepper2.runSpeed();
+    stepper3.runSpeed();
+    stepper4.runSpeed();
   }
 }
 
