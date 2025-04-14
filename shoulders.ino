@@ -154,10 +154,10 @@ void moveShoulder(char side, int dir, int target) {
     posRight += STEP*dir;
 
     while(posRight > MIN_ANGLE && posRight < MAX_ANGLE) {
-      if(dir == DOWN && posLeft <= target) {
+      if(dir == DOWN && posRight <= target) {
         break; 
       }
-      else if(dir == UP && posLeft >= target) {
+      else if(dir == UP && posRight >= target) {
         break;
       }
       step(stepPin);
