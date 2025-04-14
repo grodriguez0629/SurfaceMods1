@@ -10,10 +10,10 @@ AccelStepper stepper4(1, 24,25); //Rear Left
 //Set up is automatically run once the second the code runs
 void setup() {
   Serial.begin(9600); //Enable serial
-  stepper1.setMaxSpeed(1000); // Set maximum speed value for the stepper
-  stepper2.setMaxSpeed(1000);
-  stepper3.setMaxSpeed(1000);
-  stepper4.setMaxSpeed(1000);
+  stepper1.setMaxSpeed(2000); // Set maximum speed value for the stepper
+  stepper2.setMaxSpeed(2000);
+  stepper3.setMaxSpeed(2000);
+  stepper4.setMaxSpeed(2000);
 
 }
 
