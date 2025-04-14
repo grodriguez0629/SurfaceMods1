@@ -21,8 +21,8 @@ void setup() {
 void moveForward(int steps) {
   //Set the movements that need to be done
   stepper1.move(steps); 
-  stepper2.move(steps);
-  stepper3.move(steps); 
+  stepper2.move(-steps);
+  stepper3.move(-steps); 
   stepper4.move(steps); 
    //While the steppers have not reached their final position
 while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
@@ -37,8 +37,8 @@ while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.d
 void moveBackward(int steps) {
   //Set the movements that need to be done
   stepper1.move(-steps); 
-  stepper2.move(-steps);
-  stepper3.move(-steps); 
+  stepper2.move(steps);
+  stepper3.move(steps); 
   stepper4.move(-steps); 
   //While the steppers have not reached their final position
 while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
@@ -52,8 +52,8 @@ while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.d
 void turnLeft(int steps) {
   //Set the movements that need to be done
   stepper1.move(-steps); 
-  stepper2.move(steps);
-  stepper3.move(steps); 
+  stepper2.move(-steps);
+  stepper3.move(-steps); 
   stepper4.move(-steps); 
   //While the steppers have not reached their final position
 while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.distanceToGo() != 0 || stepper4.distanceToGo() != 0) {    //run each stepper
@@ -66,8 +66,8 @@ while(stepper1.distanceToGo() != 0 || stepper2.distanceToGo() != 0 || stepper3.d
 void turnRight(int steps) {
   //Set the movements that need to be done
   stepper1.move(steps); 
-  stepper2.move(-steps);
-  stepper3.move(-steps); 
+  stepper2.move(steps);
+  stepper3.move(steps); 
   stepper4.move(steps); 
 
   //While the steppers have not reached their final position
