@@ -35,7 +35,7 @@
 #define UP 1
 #define DOWN -1
 
-#define STEP 0.05625
+#define STEP 1.8
 #define MAX_ANGLE 90.0
 #define MIN_ANGLE 0.0
 
@@ -82,7 +82,7 @@ void setup() {
   rightStepper.clearStatus();
   rightStepper.setDecayMode(HPSDDecayMode::AutoMixed);
   rightStepper.setCurrentMilliamps36v8(4000);
-  rightStepper.setStepMode(HPSDStepMode::MicroStep32);
+  rightStepper.setStepMode(HPSDStepMode::MicroStep1);
   rightStepper.enableDriver();
 }
 
