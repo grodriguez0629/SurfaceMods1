@@ -8,30 +8,30 @@ from tkinter import ttk
 #serial initialization
 #serial port for communication
 #baudrate
-SERIALPORT = 'COM_3'
+SERIALPORT = 'COM6'
 BAUDRATE = 9600
-#board = serial.Serial(port=SERIALPORT, baudrate=BAUDRATE)
+board = serial.Serial(port=SERIALPORT, baudrate=BAUDRATE)
 
 #sends rover movement to the board
 def send_movement(steps, dir):
     print("moving rover " + steps.get() + " steps " + dir.get())
-    cmd = steps.get() + " " + dir.get()
+    cmd =  dir.get() + steps.get() + "\n"
     print(cmd)
-    #board.write(cmd.encode())
+    board.write(cmd.encode())
 
 #sends shoulder movement to the board
 def send_shoulder(deg, side, dir):
     print("moving " + side.get() + " shoulder " + dir.get() + " " + deg.get() + " degrees")
-    cmd = side.get() + " " + dir.get() + " " + deg.get()
+    cmd = side.get() + dir.get() + deg.get()
     print(cmd)
-    #board.write(cmd.encode())
+    board.write(cmd.encode())
     
 #sends auger movemnt
 def send_auger(spd_prof, dir):
     print("starting auger at " + spd_prof.get() + " in the " + dir.get() + " direction")
     cmd = spd_prof.get() + " " + dir.get()
     print(cmd)
-   # board.write(cmd.encode())
+    board.write(cmd.encode())
 
 #exits program
 def quit():
