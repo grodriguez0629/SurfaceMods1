@@ -1,89 +1,164 @@
-//include AccelStepper library classes
-#include <AccelStepper.h>
-#include <MultiStepper.h>
+const int FLstep = 2;
+const int FLdir = 23;
+const int FRstep = 4;
+const int FRdir = 27;
+const int RRstep = 6;
+const int RRdir = 29;
+const int RLstep = 8;
+const int RLdir = 25;
 
-//Name of motor(Type of driver, STEP, DIR)
-AccelStepper frontLeft(1, 50, 51);
-AccelStepper frontRight(1, 52, 53);
-AccelStepper rearLeft(1, 54, 55);
-AccelStepper rearRight(1, 56, 57);
-
-//Create multi stepper instance
-MultiStepper steppersControl;
-
-void setBeginVals(AccelStepper stepper_name) {
-  stepper_name.setMaxSpeed(1000);
-  stepper_name.setAcceleration(500);
-  stepper_name.setCurrentPosition(0);
-  steppersControl.addStepper(stepper_name);
-}
-
+//Set up is automatically run once the second the code runs
 void setup() {
-  //initialize each value
-  setBeginVals(frontLeft);
-  setBeginVals(frontRight);
-  setBeginVals(rearLeft);
-  setBeginVals(rearRight);
+  Serial.begin(9600); //Enable serial
+  //Setup FL pins
+  pinMode(FLstep, OUTPUT);
+  pinMode(FLdir, OUTPUT);
+
+  //Setup RL pins
+  pinMode(RLstep, OUTPUT);
+  pinMode(RLdir, OUTPUT);
+
+  //Setup FR pins
+  pinMode(FRstep, OUTPUT);
+  pinMode(FRdir, OUTPUT);
+
+  //Setup RR pins
+  pinMode(RRstep, OUTPUT);
+  pinMode(RRdir, OUTPUT);
+
 }
 
-
-void turnLeft(int steps) {
-  //Set the movements that need to be done
-  frontLeft.move(-steps);
-  rearLeft.move(-steps);
-  frontRight.move(steps);
-  rearRight.move(steps);
-  //Execute all of the movements simultaneously
-  steppersControl.runSpeedToPosition();
-}
-
-void turnRight(int steps) {
-  //Set the movements that need to be done
-  frontLeft.move(steps);
-  rearLeft.move(steps);
-  frontRight.move(-steps);
-  rearRight.move(-steps);
-  steppersControl.runSpeedToPosition();
-}
 
 void moveForward(int steps) {
-  //Set the movements that need to be done
-  frontLeft.move(steps);
-  rearLeft.move(steps);
-  frontRight.move(steps);
-  rearRight.move(steps);
-  steppersControl.runSpeedToPosition();
+  //Set rotational direction
+  digitalWrite(FLdir, HIGH);
+  digitalWrite(RLdir, HIGH);
+  digitalWrite(FRdir, HIGH);
+  digitalWrite(RRdir, HIGH);
+
+  //Pulse step port until all steps have been run
+  for(int i = 0; i <= steps; i++) {
+    digitalWrite(FLstep, HIGH);
+    digitalWrite(RLstep, HIGH);
+    digitalWrite(FRstep, HIGH);
+    digitalWrite(RRstep, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(FLstep, LOW);
+    digitalWrite(RLstep, LOW);
+    digitalWrite(FRstep, LOW);
+    digitalWrite(RRstep, LOW);
+    delayMicroseconds(1000);
+  }
 }
 
 void moveBackward(int steps) {
-  //Set the movements that need to be done
-  frontLeft.move(-steps);
-  rearLeft.move(-steps);
-  frontRight.move(-steps);
-  rearRight.move(-steps);
-  steppersControl.runSpeedToPosition();
+  //Set rotational direction
+  digitalWrite(FLdir, LOW);
+  digitalWrite(RLdir, LOW);
+  digitalWrite(FRdir, LOW);
+  digitalWrite(RRdir, LOW);
+
+  //Pulse step port until all steps have been run
+  for(int i = 0; i <= steps; i++) {
+    digitalWrite(FLstep, HIGH);
+    digitalWrite(RLstep, HIGH);
+    digitalWrite(FRstep, HIGH);
+    digitalWrite(RRstep, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(FLstep, LOW);
+    digitalWrite(RLstep, LOW);
+    digitalWrite(FRstep, LOW);
+    digitalWrite(RRstep, LOW);
+    delayMicroseconds(1000);
+  }
 }
 
-void emergencyStop() {
-  // Immediately stop all motors
-  frontLeft.stop();
-  frontRight.stop();
-  rearLeft.stop();
-  rearRight.stop();
+void turnLeft(int steps) {
+  //Set rotational direction
+  digitalWrite(FLdir, LOW);
+  digitalWrite(RLdir, LOW);
+  digitalWrite(FRdir, HIGH);
+  digitalWrite(RRdir, HIGH);
+
+  //Pulse step port until all steps have been run
+  for(int i = 0; i <= steps; i++) {
+    digitalWrite(FLstep, HIGH);
+    digitalWrite(RLstep, HIGH);
+    digitalWrite(FRstep, HIGH);
+    digitalWrite(RRstep, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(FLstep, LOW);
+    digitalWrite(RLstep, LOW);
+    digitalWrite(FRstep, LOW);
+    digitalWrite(RRstep, LOW);
+    delayMicroseconds(1000);
+  }
 }
+
+turnRight(int steps) {
+  //Set rotational direction
+  digitalWrite(FLdir, HIGH);
+  digitalWrite(RLdir, HIGH);
+  digitalWrite(FRdir, LOW);
+  digitalWrite(RRdir, LOW);
+
+  //Pulse step port until all steps have been run
+  for(int i = 0; i <= steps; i++) {
+    digitalWrite(FLstep, HIGH);
+    digitalWrite(RLstep, HIGH);
+    digitalWrite(FRstep, HIGH);
+    digitalWrite(RRstep, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(FLstep, LOW);
+    digitalWrite(RLstep, LOW);
+    digitalWrite(FRstep, LOW);
+    digitalWrite(RRstep, LOW);
+    delayMicroseconds(1000);
+  }
+}
+
 
 void loop() {
-  //The Nema 17 Motor Moves 1.8 degrees per step. So to turn left or right 90 degrees would be 50 steps.
-  //Turn left 90 degrees
-  turnLeft(50);
-  //Wait half a second
-  delay(500);
-  //Move forward 100 steps
-  moveForward(100);
-  delay(500);
-  //Turn right 90 degrees
-  turnRight(50);
-  //Move Backward 100 steps
-  moveBackward(100);
-  //Can create an if-condition to run the emergencystop command. However, we don't have sensors so TBD on how we implement that
+  //Prompt for user input
+  Serial.println("Enter command (F, B, L, R) and steps. (ex: 'F 200'): ");
+  //Wait for user input
+  while (Serial.available() == 0) {}
+  //Read string from command line until newline character
+  String cmd = Serial.readStringUntil('\n');
+  //Trim out extra characters from string.
+  cmd.trim();
+
+  //Save input Values
+  char direction = cmd.charAt(0);
+  int steps = cmd.substring(2).toInt();
+
+  //Print out user choices
+  Serial.print("Direction: ");
+  Serial.println(direction);
+  Serial.print("Steps: ");
+  Serial.println(steps);
+
+  //Switch statement to execute proper movement based on choice.
+  switch(direction) {
+    case 'F': //If F, run move forward the number of steps
+      Serial.println("Moving forward");
+      moveForward(steps);
+      break;
+    case 'B': //If B, run move backward the number of steps
+      Serial.println("Moving backward");
+      moveBackward(steps);
+      break;
+    case 'L': //If L, run turn left the number of steps
+      Serial.println("Turning left");
+      turnLeft(steps);
+      break;
+    case 'R': //If R, run turn right the number of steps
+      Serial.println("Turning right");
+      turnRight(steps);
+      break;
+    default: //If it doesn't match any of these, print out invalid
+      Serial.println("Invalid command.");
+      break;
+  }
+  delay (1000);
 }
