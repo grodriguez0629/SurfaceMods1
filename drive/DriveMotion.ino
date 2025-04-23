@@ -42,12 +42,12 @@ void moveForward(int steps) {
     digitalWrite(RLstep, HIGH);
     digitalWrite(FRstep, HIGH);
     digitalWrite(RRstep, HIGH);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
     digitalWrite(FLstep, LOW);
     digitalWrite(RLstep, LOW);
     digitalWrite(FRstep, LOW);
     digitalWrite(RRstep, LOW);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
 }
 
@@ -64,12 +64,12 @@ void moveBackward(int steps) {
     digitalWrite(RLstep, HIGH);
     digitalWrite(FRstep, HIGH);
     digitalWrite(RRstep, HIGH);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
     digitalWrite(FLstep, LOW);
     digitalWrite(RLstep, LOW);
     digitalWrite(FRstep, LOW);
     digitalWrite(RRstep, LOW);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
 }
 
@@ -86,12 +86,12 @@ void turnLeft(int steps) {
     digitalWrite(RLstep, HIGH);
     digitalWrite(FRstep, HIGH);
     digitalWrite(RRstep, HIGH);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
     digitalWrite(FLstep, LOW);
     digitalWrite(RLstep, LOW);
     digitalWrite(FRstep, LOW);
     digitalWrite(RRstep, LOW);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
 }
 
@@ -108,12 +108,12 @@ void turnRight(int steps) {
     digitalWrite(RLstep, HIGH);
     digitalWrite(FRstep, HIGH);
     digitalWrite(RRstep, HIGH);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
     digitalWrite(FLstep, LOW);
     digitalWrite(RLstep, LOW);
     digitalWrite(FRstep, LOW);
     digitalWrite(RRstep, LOW);
-    delayMicroseconds(1000);
+    delayMicroseconds(1);
   }
 }
 
