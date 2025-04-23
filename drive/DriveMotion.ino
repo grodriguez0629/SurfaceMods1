@@ -3,7 +3,7 @@ const int FLdir = 23;
 const int FRstep = 4;
 const int FRdir = 27;
 const int RRstep = 6;
-const int RRdir = 29;
+const int RRdir = 28;
 const int RLstep = 8;
 const int RLdir = 25;
 
