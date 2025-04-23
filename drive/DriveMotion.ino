@@ -95,7 +95,7 @@ void turnLeft(int steps) {
   }
 }
 
-turnRight(int steps) {
+void turnRight(int steps) {
   //Set rotational direction
   digitalWrite(FLdir, HIGH);
   digitalWrite(RLdir, HIGH);
