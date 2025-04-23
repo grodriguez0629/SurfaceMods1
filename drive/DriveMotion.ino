@@ -33,8 +33,8 @@ void moveForward(int steps) {
   //Set rotational direction
   digitalWrite(FLdir, HIGH);
   digitalWrite(RLdir, HIGH);
-  digitalWrite(FRdir, HIGH);
-  digitalWrite(RRdir, HIGH);
+  digitalWrite(FRdir, LOW);
+  digitalWrite(RRdir, LOW);
 
   //Pulse step port until all steps have been run
   for(int i = 0; i <= steps; i++) {
@@ -55,8 +55,8 @@ void moveBackward(int steps) {
   //Set rotational direction
   digitalWrite(FLdir, LOW);
   digitalWrite(RLdir, LOW);
-  digitalWrite(FRdir, LOW);
-  digitalWrite(RRdir, LOW);
+  digitalWrite(FRdir, HIGH);
+  digitalWrite(RRdir, HIGH);
 
   //Pulse step port until all steps have been run
   for(int i = 0; i <= steps; i++) {
@@ -77,8 +77,8 @@ void turnLeft(int steps) {
   //Set rotational direction
   digitalWrite(FLdir, LOW);
   digitalWrite(RLdir, LOW);
-  digitalWrite(FRdir, HIGH);
-  digitalWrite(RRdir, HIGH);
+  digitalWrite(FRdir, LOW);
+  digitalWrite(RRdir, LOW);
 
   //Pulse step port until all steps have been run
   for(int i = 0; i <= steps; i++) {
@@ -99,8 +99,8 @@ void turnRight(int steps) {
   //Set rotational direction
   digitalWrite(FLdir, HIGH);
   digitalWrite(RLdir, HIGH);
-  digitalWrite(FRdir, LOW);
-  digitalWrite(RRdir, LOW);
+  digitalWrite(FRdir, HIGH);
+  digitalWrite(RRdir, HIGH);
 
   //Pulse step port until all steps have been run
   for(int i = 0; i <= steps; i++) {
