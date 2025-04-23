@@ -15,7 +15,7 @@ board = serial.Serial(port=SERIALPORT, baudrate=BAUDRATE)
 #sends rover movement to the board
 def send_movement(steps, dir):
     print("moving rover " + steps.get() + " steps " + dir.get())
-    cmd =  dir.get() + steps.get() + "\n"
+    cmd =  dir.get() + " " + steps.get() + "\n"
     print(cmd)
     board.write(cmd.encode())
 
